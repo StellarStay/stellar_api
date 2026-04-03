@@ -95,13 +95,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = AccessDeniedException.class)
     public ResponseEntity<ApiResponse<Void>> handleAccessDeniedException(AccessDeniedException ex, HttpServletRequest request) {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
-                .code(ErrorCode.UNAUTHORIZED.getCode())
-                .message(ErrorCode.UNAUTHORIZED.getMessage())
+                .code(ErrorCode.FORBIDDEN.getCode())
+                .message(ErrorCode.FORBIDDEN.getMessage())
                 .timestamp(Instant.now())
                 .path(request.getRequestURI())
                 .build();
 
-        return ResponseEntity.status(ErrorCode.UNAUTHORIZED.getStatus()).body(response);
+        return ResponseEntity.status(ErrorCode.FORBIDDEN.getStatus()).body(response);
     }
 
 //    7. Bắt lỗi 401 unauthenticated (chưa đăng nhập), lỗi này sẽ được Spring Security tự động bắt và trả về response 401 nhưng vì trả về đúng theo response của mình nên phải custom lại
@@ -124,13 +124,13 @@ public ResponseEntity<ApiResponse<Void>> handleAuthenticationCredentialsNotFound
         log.error("Lỗi hệ thống không xác định: ", ex); // Log lỗi để dễ dàng debug
 
         ApiResponse<Void> response = ApiResponse.<Void>builder()
-                .code(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode())
-                .message(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())
+                .code(ErrorCode.INTERNAL_SERVER_ERROR.getCode())
+                .message(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())
                 .timestamp(Instant.now())
                 .path(request.getRequestURI())
                 .build();
 
-        return ResponseEntity.status(ErrorCode.UNCATEGORIZED_EXCEPTION.getStatus()).body(response);
+        return ResponseEntity.status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus()).body(response);
     }
 
 

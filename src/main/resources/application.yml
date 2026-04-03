@@ -1,6 +1,8 @@
 spring:
   application:
     name: Stellar_Stay
+  profiles:
+    active: local
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
