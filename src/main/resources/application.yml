@@ -13,9 +13,15 @@ spring:
       port: ${REDIS_PORT}
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    baseline-version: 0
 
 jwt:
   secret: ${JWT_SECRET}
+  access-token-expiry: ${JWT_ACCESS_TOKEN_EXPIRY}
+  refresh-token-expiry: ${JWT_REFRESH_TOKEN_EXPIRY}
   expiration: ${JWT_EXPIRATION}

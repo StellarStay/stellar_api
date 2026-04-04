@@ -33,4 +33,9 @@ public class Account extends BaseEntity {
     @Column(name = "is_email_verified", nullable = false)
     private boolean isEmailVerified;
 
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RefreshToken> refreshTokens;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OTPCode> otpCodes;
 }

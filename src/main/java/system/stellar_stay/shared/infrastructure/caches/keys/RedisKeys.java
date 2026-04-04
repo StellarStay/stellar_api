@@ -1,0 +1,36 @@
+package system.stellar_stay.shared.infrastructure.caches.keys;
+
+import java.util.UUID;
+
+public class RedisKeys {
+
+    private RedisKeys(){}
+
+//    Key for permissions of an account
+    public static String permissionKey(UUID accountId) {
+        return "permissions:" + accountId;
+    }
+
+//    Key for refreshToken
+    public static String refreshTokenKey(UUID accountId) {
+        return "refreshToken:" + accountId;
+    }
+
+//    Key for OTP code
+    public static String otpCodeKey(String type, String email) {
+        return type + "otp:" + email.toLowerCase();
+    }
+
+//    counter for OTP code generation to prevent abuse
+    public static String otpRateLimitKey(String email) {
+        return "rate:otp:" + email.toLowerCase();
+    }
+
+    public static final long TTL_PERMISSION      = 15 * 60L;        // 15 phút
+    public static final long TTL_REFRESH_TOKEN   = 30 * 24 * 3600L; // 30 ngày
+    public static final long TTL_OTP             = 5 * 60L;         // 5 phút
+    public static final long TTL_OTP_RESET_PWD   = 3 * 60L;         // 3 phút
+    public static final long TTL_OTP_RATE_LIMIT  = 60 * 60L;        // 1 giờ
+    public static final long TTL_AVAILABILITY    = 5 * 60L;         // 5 phút
+
+}

@@ -12,6 +12,7 @@ public enum ErrorCode {
     API_NOT_FOUND        ("api_not_found",         HttpStatus.NOT_FOUND,             "Endpoint không tồn tại"),
     METHOD_NOT_ALLOWED   ("method_not_allowed",    HttpStatus.METHOD_NOT_ALLOWED,    "HTTP method không hỗ trợ"),
     TOO_MANY_REQUESTS    ("too_many_requests",     HttpStatus.TOO_MANY_REQUESTS,     "Quá nhiều yêu cầu"),
+    RESOURCE_NOT_FOUND      ("resource_not_found",    HttpStatus.NOT_FOUND,             "Tài nguyên không tồn tại"),
 
     // ── Auth ────────────────────────────────────────────────────
     UNAUTHENTICATED      ("unauthenticated",       HttpStatus.UNAUTHORIZED,  "Chưa đăng nhập"),
