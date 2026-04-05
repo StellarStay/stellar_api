@@ -17,76 +17,65 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisSupported {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final StringRedisTemplate redisTemplate; // ← đổi thành StringRedisTemplate
 
     // ── String operations ──────────────────────────────────
 
-    // Lưu string value với TTL
     public void set(String key, String value, long ttlSeconds) {
         redisTemplate.opsForValue().set(key, value, ttlSeconds, TimeUnit.SECONDS);
     }
 
-    // Lấy string value — trả null nếu không có
     public String get(String key) {
-        Object value = redisTemplate.opsForValue().get(key);
-        return value != null ? value.toString() : null;
+        return redisTemplate.opsForValue().get(key); // trả thẳng String, không cần cast
     }
 
-    // ── Set operations (dùng cho permissions) ─────────────
+    // ── Set operations ─────────────────────────────────────
 
-    // Lưu Set<String> với TTL
     public void setSet(String key, Set<String> values, long ttlSeconds) {
-        redisTemplate.delete(key); // clear set cũ nếu có
-        redisTemplate.opsForSet().add(key, values.toArray());
-        redisTemplate.expire(key, ttlSeconds, TimeUnit.SECONDS);
+        redisTemplate.delete(key);
+        if (!values.isEmpty()) {
+            redisTemplate.opsForSet().add(key, values.toArray(new String[0]));
+            redisTemplate.expire(key, ttlSeconds, TimeUnit.SECONDS);
+        }
     }
 
-    // Lấy Set — trả null nếu key không tồn tại
-    public Set<Object> getSet(String key) {
-        Set<Object> members = redisTemplate.opsForSet().members(key);
+    public Set<String> getSet(String key) { // ← trả Set<String> thay vì Set<Object>
+        Set<String> members = redisTemplate.opsForSet().members(key);
         if (members == null || members.isEmpty()) return null;
         return members;
     }
 
-    // ── Counter operations (dùng cho rate limit OTP) ───────
+    // ── Counter operations ─────────────────────────────────
 
-    // Tăng counter lên 1, set TTL nếu là lần đầu
     public long increment(String key, long ttlSeconds) {
         Long count = redisTemplate.opsForValue().increment(key);
         if (count != null && count == 1) {
-            // Lần đầu tạo key → set TTL
             redisTemplate.expire(key, ttlSeconds, TimeUnit.SECONDS);
         }
         return count != null ? count : 0L;
     }
 
-    // Lấy giá trị counter hiện tại
     public long getCounter(String key) {
-        Object value = redisTemplate.opsForValue().get(key);
+        String value = redisTemplate.opsForValue().get(key);
         if (value == null) return 0L;
-        return Long.parseLong(value.toString());
+        return Long.parseLong(value);
     }
 
     // ── Common operations ──────────────────────────────────
 
-    // Xóa key
     public void delete(String key) {
         redisTemplate.delete(key);
     }
 
-    // Check key có tồn tại không
     public boolean exists(String key) {
-        Boolean result = redisTemplate.hasKey(key);
-        return Boolean.TRUE.equals(result);
+        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
     }
 
-    // Lấy TTL còn lại (seconds) — trả -1 nếu không có TTL, -2 nếu key không tồn tại
     public long getTtl(String key) {
         Long ttl = redisTemplate.getExpire(key, TimeUnit.SECONDS);
         return ttl != null ? ttl : -2L;
     }
 
-    // Gia hạn TTL
     public void extendTtl(String key, long ttlSeconds) {
         redisTemplate.expire(key, ttlSeconds, TimeUnit.SECONDS);
     }

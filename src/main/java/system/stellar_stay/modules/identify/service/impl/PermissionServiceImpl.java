@@ -33,7 +33,7 @@ public class PermissionServiceImpl implements PermissionService {
         String redisKey = RedisKeys.permissionKey(accountId);
 
         // 1. Check in Redis
-        Set<Object> cachesPermissions = redisSupported.getSet(redisKey);
+        Set<String> cachesPermissions = redisSupported.getSet(redisKey);
         if (cachesPermissions != null) {
             return cachesPermissions.stream()
                     .map(Object::toString)

@@ -12,8 +12,8 @@ public class RedisKeys {
     }
 
 //    Key for refreshToken
-    public static String refreshTokenKey(UUID accountId) {
-        return "refreshToken:" + accountId;
+    public static String refreshTokenKey(String tokenHashed) {
+        return "refreshToken:" + tokenHashed;
     }
 
 //    Key for OTP code
