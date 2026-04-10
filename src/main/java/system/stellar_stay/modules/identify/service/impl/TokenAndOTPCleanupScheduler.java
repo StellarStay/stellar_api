@@ -33,7 +33,7 @@ public class TokenAndOTPCleanupScheduler {
         // Có nghĩa là tất cả các OTP đã được tạo ra trước thời điểm này sẽ được coi là hết hạn và sẽ bị xóa khỏi hệ thống.
 //      Bởi vì tất cả otp mới tạo thì đều sẽ có thời gian sống là 5 phút,
 //      nên cứ sau 30 phút thì mình sẽ xóa tất cả các otp đã tồn tại trước thời điểm hiện tại, tức là những otp đã tồn tại hơn 5 phút, tức là đã hết hạn.
-        int deletedCount = otpService.cleanupExpiredOtps(threshold);
+        int deletedCount = otpService.cleanupExpiredOtp(threshold);
         log.info("Cleanup expired OTPs for {} minutes", deletedCount);
 
     }

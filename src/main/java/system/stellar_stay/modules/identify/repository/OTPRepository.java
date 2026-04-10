@@ -21,4 +21,13 @@ public interface OTPRepository extends JpaRepository<OTPCode, UUID> {
     """)
     int deleteByExpiredAtBefore(LocalDateTime threshold);
 
+
+    @Modifying
+    @Transactional
+    @Query("""
+        delete from OTPCode otp
+        where otp.emailVerified = :email and otp.status = :status
+        """)
+    void deleteByEmailAndStatus(String email, String status);
+
 }

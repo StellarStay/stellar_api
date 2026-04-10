@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 @SuperBuilder
 public class OTPCode extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "account_id", nullable = true)
     private Account account;
 
