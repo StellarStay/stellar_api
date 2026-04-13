@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import system.stellar_stay.modules.identify.enums.OTPStatus;
+import system.stellar_stay.modules.identify.enums.OTPType;
 import system.stellar_stay.shared.infrastructure.persistence.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -31,6 +32,10 @@ public class OTPCode extends BaseEntity {
     @Column(name = "otp_status", nullable = false)
     @Enumerated(EnumType.STRING)
     private OTPStatus status;
+
+    @Column(name = "otp_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private OTPType type;
 
     @Column(name = "otp_hashed", nullable = false)
     private String otpHashed;

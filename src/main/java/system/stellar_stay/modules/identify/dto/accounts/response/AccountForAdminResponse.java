@@ -1,17 +1,13 @@
-package system.stellar_stay.modules.identify.dto.accounts.request;
+package system.stellar_stay.modules.identify.dto.accounts.response;
 
 import system.stellar_stay.modules.identify.enums.AccountStatus;
 import system.stellar_stay.modules.identify.enums.GenderEnum;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
-public record CreateAccountForAdminRequest(
-        // account
+public record AccountForAdminResponse(
         String email,
         String password,
-
-        // profile
         AccountStatus accountStatus,
         String idCardNumber,
         String fullName,
@@ -19,9 +15,6 @@ public record CreateAccountForAdminRequest(
         String avatarUrl,
         GenderEnum gender,
         LocalDate birthDate,
-        int loyaltyPoints,
-
-        // role and permission
-        UUID roleId
+        int loyaltyPoints
 ) {
 }

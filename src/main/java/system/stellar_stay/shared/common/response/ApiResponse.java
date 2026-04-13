@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,6 +20,6 @@ public class ApiResponse<T> {
 
     private String message;
     private T result;
-    private Instant timestamp;
+    private LocalDateTime timestamp;
     private String path;
 }

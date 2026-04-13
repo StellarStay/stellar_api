@@ -18,7 +18,7 @@ public class RedisKeys {
 
 //    Key for OTP code
     public static String otpCodeKey(String type, String email) {
-        return type + "otp:" + email.toLowerCase();
+        return "otp: "+ type.toLowerCase()  +": " + email.toLowerCase();
     }
 
 //    counter for OTP code generation to prevent abuse

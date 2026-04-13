@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import system.stellar_stay.modules.identify.entity.OTPCode;
+import system.stellar_stay.modules.identify.enums.OTPStatus;
+import system.stellar_stay.modules.identify.enums.OTPType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -26,8 +28,15 @@ public interface OTPRepository extends JpaRepository<OTPCode, UUID> {
     @Transactional
     @Query("""
         delete from OTPCode otp
-        where otp.emailVerified = :email and otp.status = :status
+        where otp.emailVerified = :email and otp.type = :type and otp.status = :status
         """)
-    void deleteByEmailAndStatus(String email, String status);
+    void deleteByEmailAndTypeAndStatus(String email, OTPType type, OTPStatus status);
+
+    @Query("""
+        select otp
+        from OTPCode otp
+        where otp.emailVerified = :email and otp.type = :type and otp.status = :status
+        """)
+    OTPCode findByEmailAndTypeAndStatus(String email, OTPType type, OTPStatus status);
 
 }

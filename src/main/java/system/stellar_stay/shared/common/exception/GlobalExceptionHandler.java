@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(ex.getErrorCode().getCode())
                 .message(responseMessage)
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .path(request.getRequestURI())
                 .build();
 
@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(ErrorCode.VALIDATION_ERROR.getCode())
                 .message(ErrorCode.VALIDATION_ERROR.getMessage())
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .path(request.getRequestURI())
                 .build();
 
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(ErrorCode.VALIDATION_ERROR.getCode())
                 .message(ErrorCode.VALIDATION_ERROR.getMessage())
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .path(request.getRequestURI())
                 .build();
 
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(ErrorCode.INVALID_FORMAT.getCode())
                 .message(ErrorCode.INVALID_FORMAT.getMessage())
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .path(request.getRequestURI())
                 .build();
 
@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(ErrorCode.API_NOT_FOUND.getCode())
                 .message(ErrorCode.API_NOT_FOUND.getMessage())
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .path(request.getRequestURI())
                 .build();
 
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(ErrorCode.FORBIDDEN.getCode())
                 .message(ErrorCode.FORBIDDEN.getMessage())
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .path(request.getRequestURI())
                 .build();
 
@@ -110,7 +110,7 @@ public ResponseEntity<ApiResponse<Void>> handleAuthenticationCredentialsNotFound
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(ErrorCode.UNAUTHENTICATED.getCode())
                 .message(ErrorCode.UNAUTHENTICATED.getMessage())
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .path(request.getRequestURI())
                 .build();
 
@@ -126,7 +126,7 @@ public ResponseEntity<ApiResponse<Void>> handleAuthenticationCredentialsNotFound
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(ErrorCode.INTERNAL_SERVER_ERROR.getCode())
                 .message(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .path(request.getRequestURI())
                 .build();
 

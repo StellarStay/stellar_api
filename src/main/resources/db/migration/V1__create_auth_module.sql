@@ -58,6 +58,7 @@ CREATE TABLE otp_code(
     account_id    UUID,
     email_verified VARCHAR(255) NOT NULL,
     otp_status   VARCHAR(255) NOT NULL,
+    otp_type   VARCHAR(255) NOT NULL,
     otp_hashed    VARCHAR(255) NOT NULL,
     expired_at    TIMESTAMP NOT NULL
 );

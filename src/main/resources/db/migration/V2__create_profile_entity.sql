@@ -1,7 +1,5 @@
 CREATE TABLE profiles (
     account_id UUID PRIMARY KEY,
-    created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP,
     id_card_number VARCHAR(255) NOT NULL UNIQUE,
     full_name VARCHAR(255) NOT NULL,
     phone_number VARCHAR(255) NOT NULL UNIQUE,

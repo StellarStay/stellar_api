@@ -24,6 +24,7 @@ import system.stellar_stay.shared.common.response.ApiResponse;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -115,7 +116,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .path(path)
-                .timestamp(Instant.now())
+                .timestamp(LocalDateTime.now())
                 .build();
 
         new ObjectMapper()

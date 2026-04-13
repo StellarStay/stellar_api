@@ -34,12 +34,7 @@ public class SecurityConfig {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     private static final String[] PUBLIC_ROUTES = {
-            "/api/v1/auth/register",
-            "/api/v1/auth/login",
-            "/api/v1/auth/refresh",
-            "/api/v1/auth/verify-email",
-            "/api/v1/auth/forgot-password",
-            "/api/v1/auth/reset-password",
+            "/api/v1/account/**",
             "/api/v1/properties/**",
             "/api/v1/rooms/**",
             "/actuator/health",

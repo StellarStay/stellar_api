@@ -24,13 +24,13 @@ public class Profile {
     @Column(name = "account_id")
     private UUID accountId;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "account_id")
     private Account account;
 
     @Column(name = "id_card_number", nullable = false, unique = true)
-    private String IdCardNumber;
+    private String idCardNumber;
 
     @Column(name = "full_name", nullable = false)
     private String fullName;
