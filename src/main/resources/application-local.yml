@@ -18,11 +18,11 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   flyway:
     enabled: true
-    locations: classpath:db/migration 
+    locations: classpath:db/migration
     baseline-on-migrate: true
     baseline-version: 0
 
-  maiL:
+  mail:
     host: smtp.gmail.com
     port: 587
     username: khanhviet183@gmail.com
@@ -40,18 +40,20 @@ spring:
 
 
 app:
-    mail:
-      from: khanhviet183@gmail.com
-    otp:
-      email-verify-ttl: 300
-      reset-password-ttl: 180
-      rate-limit: 5
+  jwt:
+    secret: bXruEYUElDoLIhEFJnyQvL2Y0xgeflhPTwm3eGTfpJRI1p5SzH
+    access-token-expiry: 900
+    refresh-token-expiry: 2592000
+    expiration: 86400000
+
+  mail:
+    from: khanhviet183@gmail.com
+  otp:
+    email-verify-ttl: 300
+    reset-password-ttl: 180
+    rate-limit: 5
 
 
 
 
-jwt:
-  secret: bXruEYUElDoLIhEFJnyQvL2Y0xgeflhPTwm3eGTfpJRI1p5SzH
-  access-token-expiry: 900
-  refresh-token-expiry: 2592000
-  expiration: 86400000
+

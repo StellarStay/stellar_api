@@ -3,9 +3,11 @@ package system.stellar_stay.modules.identify.service.impl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import system.stellar_stay.modules.identify.entity.Account;
 import system.stellar_stay.modules.identify.entity.RefreshToken;
+import system.stellar_stay.modules.identify.repository.AccountRepository;
 import system.stellar_stay.modules.identify.repository.RefreshTokenRepository;
 import system.stellar_stay.modules.identify.service.AccountService;
 import system.stellar_stay.modules.identify.service.RefreshTokenService;
@@ -32,7 +34,7 @@ import java.util.UUID;
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final RefreshTokenRepository refreshTokenRepository;
-    private final AccountService accountService;
+    private final AccountRepository accountRepository;
     private final RedisSupported redisSupported;
     private final JwtProperties jwtProperties;
 
@@ -57,16 +59,18 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         String ipAddress = getClientIp(request);
 
 //        Get account reference
-        Account account = accountService.getAccountByAccountIdWithReference(accountId);
+        Account account = accountRepository.getReferenceById(accountId);
 //        Save to database
         RefreshToken refreshToken = RefreshToken.builder()
                 .account(account)
                 .refreshToken(tokenHashed)
                 .deviceName(deviceName)
                 .IPAddress(ipAddress)
-                .expiredAt(LocalDateTime.from(Instant.now().plusSeconds(jwtProperties.getRefreshTokenExpiration())))
+                .expiredAt(LocalDateTime.now().plusSeconds(jwtProperties.getRefreshTokenExpiration()))
+                .isRevoked(false)
                 .build();
 
+        refreshTokenRepository.save(refreshToken);
 
 //        Save to Redis
         String redisKey = RedisKeys.refreshTokenKey(tokenHashed);
@@ -77,13 +81,15 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         log.debug("Refresh token generated for account: {}", accountId);
         return tokenPlaintext;
-
     }
 
     @Override
     public RefreshToken verifyRefreshToken(String tokenPlaintext) {
-        // Tức là từ tokenPlaintext (token gốc chưa hash) thì sẽ hash nó lên, rồi check trong Redis xem có tồn tại hay không,
-        // nếu có thì sẽ lấy ra được accountId, rồi từ accountId này sẽ truy xuất được thông tin của refresh token trong database để trả về,
+        // Tức là từ tokenPlaintext (token gốc chưa hash) thì sẽ hash nó lên,
+        // rồi check trong Redis xem có tồn tại hay không,
+        // nếu có thì sẽ lấy ra được refresh token rồi trả về
+        // Nếu không có trong Redis thì mới check trong database,
+        // nếu có thì lấy ra thông tin của refresh token đó để trả về,
         // còn nếu không có thì sẽ trả về lỗi token invalid hoặc expired tùy trường hợp.
         if (tokenPlaintext == null) {
             throw new ApiException(ErrorCode.VALIDATION_ERROR, "Refresh token cannot be null");
@@ -91,23 +97,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 //        Lấy token đã hash để check
         String tokenHashed = hashRefreshToken(tokenPlaintext);
 
-//        Lấy redisKey để check trong Redis
-        String redisKey = RedisKeys.refreshTokenKey(tokenHashed);
-
-
-//        Check trong redis trước xem có tồn tại ko
-        String cachedAccountId = redisSupported.get(redisKey);
-        if (cachedAccountId == null) {
-            throw new ApiException(ErrorCode.TOKEN_INVALID, "Refresh token is invalid or has been revoked");
-        }
-
-//        Nếu trong redis không có thì mới check trong database, nếu có thì lấy ra thông tin của refresh token đó để trả về
-
         RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(tokenHashed);
         if (refreshToken == null) {
             throw new ApiException(ErrorCode.TOKEN_INVALID, "Refresh token is invalid or has been revoked");
         }
-        if (refreshToken.getExpiredAt().isBefore(LocalDateTime.now())){
+        if (refreshToken.getExpiredAt().isBefore(LocalDateTime.now())) {
             throw new ApiException(ErrorCode.TOKEN_EXPIRED, "Refresh token is invalid or has been revoked");
         }
 
@@ -121,7 +115,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
 //        Xóa trong Redis
         String redisKey = RedisKeys.refreshTokenKey(tokenHashed);
-        redisSupported.delete(RedisKeys.refreshTokenKey(tokenHashed));
+        redisSupported.delete(redisKey);
 
 //        Xóa trong database
         RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(tokenHashed);
@@ -183,11 +177,11 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private String parseDeviceName(String userAgent) {
         if (userAgent == null) return "Unknown";
-        if (userAgent.contains("iPhone"))  return "iPhone";
+        if (userAgent.contains("iPhone")) return "iPhone";
         if (userAgent.contains("Android")) return "Android";
-        if (userAgent.contains("Chrome"))  return "Chrome";
+        if (userAgent.contains("Chrome")) return "Chrome";
         if (userAgent.contains("Firefox")) return "Firefox";
-        if (userAgent.contains("Safari"))  return "Safari";
+        if (userAgent.contains("Safari")) return "Safari";
         return "Unknown";
     }
 

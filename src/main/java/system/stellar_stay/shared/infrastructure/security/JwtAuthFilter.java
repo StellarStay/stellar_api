@@ -15,6 +15,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import system.stellar_stay.modules.identify.service.PermissionService;
@@ -25,10 +26,7 @@ import system.stellar_stay.shared.common.response.ApiResponse;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -55,20 +53,31 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             UUID accountId = jwtTokenProvider.extractAccountId(token);
 
 //            Load Permissions from redis or database if not exist in redis, then put into context
-            Set<String> permissions = permissionService.getPermissionsForAccount(accountId);
+            Set<String> roles       = jwtTokenProvider.extractRoles(token);
+            Set<String> permissions = jwtTokenProvider.extractPermissions(token);
 
 //            Build Authorities
-            List<SimpleGrantedAuthority> authorities = permissions.stream()
+            List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+            roles.stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .forEach(authorities::add);
+
+            permissions.stream()
                     .map(SimpleGrantedAuthority::new)
-                    .toList();
+                    .forEach(authorities::add);
+
 
 //            Inject to SecurityContext
 //                  Đây là cái bước để Spring Security biết được user đã authenticated và có những quyền gì, để từ đó áp dụng authorization (phân quyền) cho các endpoint.
     //                  Tức flow nó sẽ là: JwtAuthFilter sẽ giải mã token, lấy accountId, lấy permissions,
     //                  rồi tạo một Authentication object (ở đây là UsernamePasswordAuthenticationToken) chứa thông tin đó, và set vào SecurityContextHolder.
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(token, null, authorities);
-            authentication.setDetails(accountId);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(accountId, null, authorities);
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            // Khi set như này xong thì trong SecurityContextHolder sẽ có thông tin
+            // accountId và authorities (roles, permissions) của user,
+            // Và muốn lấy accountId thì account.getPrincipal(),
+            // muốn lấy permissions thì account.getAuthorities()
 
         }
         catch (ApiException e){

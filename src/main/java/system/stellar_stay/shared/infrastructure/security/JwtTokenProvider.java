@@ -13,6 +13,7 @@ import system.stellar_stay.shared.common.exception.ApiException;
 import system.stellar_stay.shared.common.exception.ErrorCode;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
 
@@ -24,19 +25,16 @@ public class JwtTokenProvider {
     private final JwtProperties jwtProperties;
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(
-                Base64.getEncoder().encodeToString(
-                        HexFormat.of().parseHex(jwtProperties.getSecretKey())
-                )
-        );
+        byte[] keyBytes = jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     // ── Generate access token ──────────────────────────────
-    public String generateAccessToken(UUID accountId, Set<String> permissions) {
+    public String generateAccessToken(UUID accountId, Set<String> roles, Set<String> permissions) {
         Instant now = Instant.now();
         return Jwts.builder()
                 .subject(accountId.toString())
+                .claim("roles", roles)
                 .claim("permissions", permissions)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(jwtProperties.getAccessTokenExpiration())))
@@ -71,6 +69,15 @@ public class JwtTokenProvider {
     public Set<String> extractPermissions(String token) {
         Object perms = verifyAndExtractClaims(token).get("permissions");
         if (perms instanceof List<?> list) {
+            return new HashSet<>((List<String>) list);
+        }
+        return Set.of();
+    }
+
+    @SuppressWarnings("unchecked")
+    public Set<String> extractRoles(String token) {
+        Object roles = verifyAndExtractClaims(token).get("roles");
+        if (roles instanceof List<?> list) {
             return new HashSet<>((List<String>) list);
         }
         return Set.of();

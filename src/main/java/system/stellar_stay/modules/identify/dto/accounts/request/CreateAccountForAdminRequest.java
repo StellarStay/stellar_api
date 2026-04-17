@@ -4,15 +4,16 @@ import system.stellar_stay.modules.identify.enums.AccountStatus;
 import system.stellar_stay.modules.identify.enums.GenderEnum;
 
 import java.time.LocalDate;
+import java.util.Set;
 import java.util.UUID;
 
 public record CreateAccountForAdminRequest(
         // account
         String email,
         String password,
+        AccountStatus accountStatus,
 
         // profile
-        AccountStatus accountStatus,
         String idCardNumber,
         String fullName,
         String phoneNumber,
@@ -22,6 +23,6 @@ public record CreateAccountForAdminRequest(
         int loyaltyPoints,
 
         // role and permission
-        UUID roleId
+        Set<UUID> roleIds
 ) {
 }

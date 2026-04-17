@@ -3,13 +3,11 @@ package system.stellar_stay.modules.identify.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import system.stellar_stay.modules.identify.dto.accounts.request.RegisterAccountRequest;
-import system.stellar_stay.modules.identify.dto.accounts.request.UpdateAccountRequestForUser;
+import system.stellar_stay.modules.identify.dto.accounts.request.*;
+import system.stellar_stay.modules.identify.dto.accounts.response.AccountForAdminResponse;
 import system.stellar_stay.modules.identify.dto.accounts.response.AccountForUserResponse;
-import system.stellar_stay.modules.identify.enums.OTPType;
 import system.stellar_stay.modules.identify.service.AccountService;
 import system.stellar_stay.modules.identify.service.OTPService;
 import system.stellar_stay.shared.common.exception.ErrorCode;
@@ -27,63 +25,21 @@ public class AccountController {
     private final AccountService accountService;
 
 
-    @Operation(summary = "API send otp", description = """
-            Dùng để send otp về email:
-            1. Nhập email
-            2. Gửi otp về email
-            """)
-
-    @PostMapping("/send-otp")
-    public ResponseEntity<ApiResponse<Void>> verifyEmail(HttpServletRequest request,
-                                                         @RequestParam("email") String email,
-                                                         @RequestParam("otp-type") OTPType otpType) {
-        otpService.generateAndSendOTP(email, otpType);
-        return ResponseEntity.ok(ApiResponse.<Void>builder()
-                .code(ErrorCode.SUCCESS.getCode())
-                .message("OTP sent to your email, please check and verify")
-                .path(request.getRequestURI())
-                .timestamp(LocalDateTime.now())
-                .build());
-    }
-
-    @Operation(summary = "API verify email", description = """
-            Dùng để verify email:
-            1. FE truyền email kèm với OTP và type của OTP (REGISTER, FORGOT_PASSWORD, CHANGE_EMAIL) để xác thực email
-            2. Nếu OTP hợp lệ thì sẽ xác thực thành công, còn nếu OTP không hợp lệ thì sẽ trả về lỗi và yêu cầu nhập lại OTP
-            4. Quay về login nếu xác thực đúng
-            """)
-
-    @PostMapping("/verify-otp")
-    public ResponseEntity<ApiResponse<Void>> verifyOtp(HttpServletRequest request,
-                                                       @RequestParam("email") String email,
-                                                       @RequestParam("otp") String otp,
-                                                       @RequestParam("otp-type") OTPType otpType) {
-
-        otpService.verifyOTP(email, otp, otpType);
-        return ResponseEntity.ok(
-                ApiResponse.<Void>builder()
-                        .code(ErrorCode.SUCCESS.getCode())
-                        .message("Verify successfully, please login again")
-                        .path(request.getRequestURI())
-                        .timestamp(LocalDateTime.now())
-                        .build());
-    }
-
     // API For User
-
     // 1. Register
 
     @Operation(summary = "API register account", description = """
              Flow nó đi sẽ là:
-             - User nhập thông tin đăng kí tài khoản --> Bấm nút xác thực email -> FE tạm lưu trên localStorage hay gì đó
-             - FE gọi API send-otp và lấy email lúc nãy kèm với type là REGISTER để gửi OTP về email
-             - User nhận được OTP và nhập vào form xác thực OTP -> FE gọi API verify-otp với email, OTP và type là REGISTER để xác thực
-             - Nếu xác thực thành công thì FE sẽ gọi API register để tạo tài khoản với thông tin đã nhập lúc đầu đã được lưu tạm trên FE,
-             - Còn nếu xác thực thất bại thì FE sẽ hiện thông báo lỗi và yêu cầu nhập lại OTP
-            """)
+             - User nhập thông tin đăng kí tài khoản --> FE gọi API register account với thông tin đăng kí tài khoản
+             - Nếu thông tin đăng kí hợp lệ thì sẽ tạo tài khoản thành công
+             - Nhưng lúc này tài khoản vẫn đang ở trạng thái INACTIVE
+             - Nên lúc này FE sẽ gọi API verify OTP để xác thực email,
+                nếu xác thực thành công thì tài khoản sẽ được chuyển sang trạng thái ACTIVE và có thể đăng nhập vào hệ thống, 
+                còn nếu xác thực thất bại thì sẽ trả về lỗi và yêu cầu nhập lại OTP
+             """)
     @PostMapping("/user/register")
     public ResponseEntity<ApiResponse<AccountForUserResponse>> registerAccount(HttpServletRequest request,
-                                                                               @RequestBody RegisterAccountRequest registerAccountRequest) {
+                                                                             @RequestBody RegisterAccountRequest registerAccountRequest) {
         return ResponseEntity.ok(
                 ApiResponse.<AccountForUserResponse>builder()
                         .code(ErrorCode.SUCCESS.getCode())
@@ -94,6 +50,27 @@ public class AccountController {
                         .build()
         );
     }
+
+    @Operation(summary = "API verify for account", description = """
+             API này dùng để xác thực tài khoản sau khi đăng kí, 
+             vì sau khi đăng kí thì tài khoản vẫn đang ở trạng thái INACTIVE 
+             nên cần phải xác thực email để chuyển sang trạng thái ACTIVE và có thể đăng nhập vào hệ thống được.
+            """)
+    @PostMapping("/user/verify-email")
+    public ResponseEntity<ApiResponse<Void>> verifyAccount(HttpServletRequest request,
+                                                           @RequestBody RequestForVerifyOTP requestForVerifyOTP) {
+        accountService.verifyRegisterAccount(requestForVerifyOTP.email(), requestForVerifyOTP.otp());
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .code(ErrorCode.SUCCESS.getCode())
+                        .message("Register account successfully, please check your email to verify your account")
+                        .path(request.getRequestURI())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+
 
 
     // 2. Update Account
@@ -121,7 +98,6 @@ public class AccountController {
     }
 
 
-
     // 3. Delete Account
     @Operation(summary = "API delete account", description = """
             Dùng để xóa tài khoản của user:
@@ -137,6 +113,94 @@ public class AccountController {
                 ApiResponse.<Void>builder()
                         .code(ErrorCode.SUCCESS.getCode())
                         .message("Delete account successfully")
+                        .path(request.getRequestURI())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+
+    // API For Admin
+
+    // 1. Create account for admin
+    @Operation(summary = "API create account for admin", description = """
+            Dùng để tạo tài khoản cho admin:
+            1. Admin nhập thông tin tài khoản mới vào form tạo tài khoản
+            2. FE gọi API create account for admin với thông tin tài khoản mới để tạo tài khoản
+            3. Nếu tạo thành công thì trả về thông tin tài khoản đã được tạo, còn nếu tạo thất bại thì trả về lỗi và yêu cầu nhập lại thông tin
+            """)
+    @PostMapping("/admin")
+    public ResponseEntity<ApiResponse<AccountForAdminResponse>> createAccountForAdmin(HttpServletRequest request,
+                                                                                      @RequestBody CreateAccountForAdminRequest createAccountForAdminRequest) {
+        return ResponseEntity.ok(
+                ApiResponse.<AccountForAdminResponse>builder()
+                        .code(ErrorCode.SUCCESS.getCode())
+                        .message("Create account for admin successfully")
+                        .result(accountService.createAccountForAdmin(createAccountForAdminRequest))
+                        .path(request.getRequestURI())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+
+    // 2. Update account information for admin
+    @Operation( summary = "API update account for admin", description = """
+            Dùng để cập nhật thông tin tài khoản cho admin:
+            1. Admin nhập thông tin mới vào form cập nhật thông tin tài khoản
+            2. FE gọi API update account for admin với accountId của admin và thông tin mới để cập nhật tài khoản
+            3. Nếu cập nhật thành công thì trả về thông tin tài khoản đã được cập nhật, còn nếu cập nhật thất bại thì trả về lỗi và yêu cầu nhập lại thông tin
+            """)
+
+    @PutMapping("/admin/{accountId}")
+    public ResponseEntity<ApiResponse<AccountForAdminResponse>> updateAccountForAdmin(HttpServletRequest request,
+                                                                                      @PathVariable("accountId") UUID accountId,
+                                                                                      @RequestBody UpdateAccountRequestForAdmin updateAccountRequestForAdmin) {
+        return ResponseEntity.ok(
+                ApiResponse.<AccountForAdminResponse>builder()
+                        .code(ErrorCode.SUCCESS.getCode())
+                        .message("Create account for admin successfully")
+                        .result(accountService.updateAccountForAdmin(accountId, updateAccountRequestForAdmin))
+                        .path(request.getRequestURI())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+    // 3. Inactive account for admin
+    @Operation(summary = "API inActive account for admin", description = """
+            Dùng để vô hiệu hóa tài khoản cho admin:
+            1. Admin bấm nút vô hiệu hóa tài khoản
+            2. FE gọi API inActive account for admin với accountId của admin để vô hiệu hóa tài khoản
+            3. Nếu vô hiệu hóa thành công thì trả về thông báo vô hiệu hóa thành công, còn nếu vô hiệu hóa thất bại thì trả về lỗi và yêu cầu thử lại sau
+            """)
+    @DeleteMapping("/admin/{accountId}/inactive")
+    public ResponseEntity<ApiResponse<Void>> inActiveAccountForAdmin(HttpServletRequest request, @PathVariable("accountId") UUID accountId) {
+        accountService.inActiveAccountForAdmin(accountId);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .code(ErrorCode.SUCCESS.getCode())
+                        .message("InActive account for admin successfully")
+                        .path(request.getRequestURI())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+    // 4. BAN account for admin
+    @Operation(summary = "API ban account for admin", description = """
+            Dùng để ban tài khoản cho admin:
+            1. Admin bấm nút ban tài khoản
+            2. FE gọi API ban account for admin với accountId của admin để ban tài khoản
+            3. Nếu ban thành công thì trả về thông báo ban thành công, còn nếu ban thất bại thì trả về lỗi và yêu cầu thử lại sau
+            """)
+    @DeleteMapping("/admin/{accountId}/ban")
+    public ResponseEntity<ApiResponse<Void>> banAccountForAdmin(HttpServletRequest request, @PathVariable("accountId") UUID accountId) {
+        accountService.banAccountForAdmin(accountId);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .code(ErrorCode.SUCCESS.getCode())
+                        .message("Ban account for admin successfully")
                         .path(request.getRequestURI())
                         .timestamp(LocalDateTime.now())
                         .build()

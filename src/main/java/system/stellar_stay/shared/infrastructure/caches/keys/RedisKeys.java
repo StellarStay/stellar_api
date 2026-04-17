@@ -6,9 +6,13 @@ public class RedisKeys {
 
     private RedisKeys(){}
 
-//    Key for permissions of an account
+//    Key for permissions and roles of an account
     public static String permissionKey(UUID accountId) {
         return "permissions:" + accountId;
+    }
+
+    public static String rolesKey(UUID accountId) {
+        return "roles:" + accountId;
     }
 
 //    Key for refreshToken
@@ -26,7 +30,7 @@ public class RedisKeys {
         return "rate:otp:" + email.toLowerCase();
     }
 
-    public static final long TTL_PERMISSION      = 15 * 60L;        // 15 phút
+    public static final long TTL_PERMISSION_ROLE = 15 * 60L;        // 15 phút
     public static final long TTL_REFRESH_TOKEN   = 30 * 24 * 3600L; // 30 ngày
     public static final long TTL_OTP             = 5 * 60L;         // 5 phút
     public static final long TTL_OTP_RESET_PWD   = 3 * 60L;         // 3 phút

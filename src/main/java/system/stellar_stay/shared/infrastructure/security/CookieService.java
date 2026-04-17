@@ -39,14 +39,15 @@ public class CookieService {
     }
 
     // ── Refresh token cookie ───────────────────────────────
-    // Path giới hạn chỉ /api/v1/auth/refresh
+    // Path giới hạn chỉ /api/v1/auth/refresh, muốn thấy ở mọi nơi thành /
     // → browser chỉ gửi cookie này khi gọi đúng endpoint đó
     public ResponseCookie createRefreshTokenCookie(String token) {
         return ResponseCookie.from("refresh_token", token)
                 .httpOnly(true)
                 .secure(secure)
                 .sameSite(sameSite)
-                .path("/api/v1/auth/refresh")
+                .path("/")
+//                .path("/api/v1/auth/refresh")
                 .maxAge(jwtProperties.getRefreshTokenExpiration())
                 .build();
     }
@@ -67,7 +68,8 @@ public class CookieService {
                 .httpOnly(true)
                 .secure(secure)
                 .sameSite(sameSite)
-                .path("/api/v1/auth/refresh")
+                .path("/")
+//              .path("/api/v1/auth/refresh")
                 .maxAge(0)
                 .build();
     }

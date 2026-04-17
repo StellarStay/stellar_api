@@ -5,22 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import system.stellar_stay.modules.identify.dto.roles.response.RoleInformationResponseDTO;
-import system.stellar_stay.modules.identify.enums.AccountStatus;
 import system.stellar_stay.modules.identify.enums.GenderEnum;
 
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountForAdminResponse {
+public class ProfileInformationResponse {
     private UUID accountId;
     private String email;
-    private AccountStatus accountStatus;
-
     private String idCardNumber;
     private String fullName;
     private String phoneNumber;
@@ -28,8 +25,6 @@ public class AccountForAdminResponse {
     private GenderEnum gender;
     private LocalDate birthDate;
     private int loyaltyPoints;
-
-    // Role and permission
     private Set<RoleInformationResponseDTO> roles;
     private Set<String> permissions;
 }

@@ -34,7 +34,7 @@ public class SecurityConfig {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     private static final String[] PUBLIC_ROUTES = {
-            "/api/v1/account/**",
+            "/api/v1/**",
             "/api/v1/properties/**",
             "/api/v1/rooms/**",
             "/actuator/health",

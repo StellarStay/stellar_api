@@ -11,10 +11,13 @@ import system.stellar_stay.modules.identify.entity.Account;
 import java.util.UUID;
 
 public interface AccountService {
-    Account getAccountByAccountIdWithReference(UUID accountId);
+    Account findAccountByEmail(String email);
+
+    Account findAccountById(UUID accountId);
 
 //    Service for customer
     AccountForUserResponse registerAccount(RegisterAccountRequest registerAccountRequest);
+    void verifyRegisterAccount(String email, String otp);
 
     AccountForUserResponse updateAccount(UUID accountId, UpdateAccountRequestForUser updateAccountRequestForUser);
 
@@ -23,9 +26,10 @@ public interface AccountService {
 
 //    Service for admin
 
-//    AccountForAdminResponse registerAccountForAdmin(CreateAccountForAdminRequest createAccountForAdminRequest);
-//
-//    AccountForAdminResponse updateAccountForAdmin(UUID accountId, UpdateAccountRequestForAdmin updateAccountRequestForAdmin);
-//
-//    void deleteAccountForAdmin(UUID accountId);
+    AccountForAdminResponse createAccountForAdmin(CreateAccountForAdminRequest createAccountForAdminRequest);
+
+    AccountForAdminResponse updateAccountForAdmin(UUID accountId, UpdateAccountRequestForAdmin updateAccountRequestForAdmin);
+
+    void inActiveAccountForAdmin(UUID accountId);
+    void banAccountForAdmin(UUID accountId);
 }
