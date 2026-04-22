@@ -1,5 +1,6 @@
 package system.stellar_stay.modules.identify.service;
 
+import org.springframework.data.domain.Page;
 import system.stellar_stay.modules.identify.dto.accounts.request.CreateAccountForAdminRequest;
 import system.stellar_stay.modules.identify.dto.accounts.request.RegisterAccountRequest;
 import system.stellar_stay.modules.identify.dto.accounts.request.UpdateAccountRequestForAdmin;
@@ -11,9 +12,6 @@ import system.stellar_stay.modules.identify.entity.Account;
 import java.util.UUID;
 
 public interface AccountService {
-    Account findAccountByEmail(String email);
-
-    Account findAccountById(UUID accountId);
 
 //    Service for customer
     AccountForUserResponse registerAccount(RegisterAccountRequest registerAccountRequest);
@@ -32,4 +30,6 @@ public interface AccountService {
 
     void inActiveAccountForAdmin(UUID accountId);
     void banAccountForAdmin(UUID accountId);
+
+    Page<AccountForAdminResponse> getAllAccountsForAdmin(int page, int size, String sortBy, String sortDir, String keyword);
 }

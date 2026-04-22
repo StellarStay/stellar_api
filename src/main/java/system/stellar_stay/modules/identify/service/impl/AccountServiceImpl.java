@@ -2,6 +2,10 @@ package system.stellar_stay.modules.identify.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,10 +16,7 @@ import system.stellar_stay.modules.identify.dto.accounts.request.UpdateAccountRe
 import system.stellar_stay.modules.identify.dto.accounts.response.AccountForAdminResponse;
 import system.stellar_stay.modules.identify.dto.accounts.response.AccountForUserResponse;
 import system.stellar_stay.modules.identify.dto.roles.response.RoleInformationResponseDTO;
-import system.stellar_stay.modules.identify.entity.Account;
-import system.stellar_stay.modules.identify.entity.AccountRole;
-import system.stellar_stay.modules.identify.entity.Profile;
-import system.stellar_stay.modules.identify.entity.Role;
+import system.stellar_stay.modules.identify.entity.*;
 import system.stellar_stay.modules.identify.enums.AccountStatus;
 import system.stellar_stay.modules.identify.enums.OTPType;
 import system.stellar_stay.modules.identify.mapper.AccountMapper;
@@ -48,23 +49,6 @@ public class AccountServiceImpl implements AccountService {
     private final RefreshTokenService refreshTokenService;
     private final OTPService otpService;
 
-    @Override
-    public Account findAccountByEmail(String email) {
-        Account accountFound = accountRepository.findByEmail(email);
-        if (accountFound == null) {
-            throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found with email: " + email);
-        }
-        return accountFound;
-    }
-
-    @Override
-    public Account findAccountById(UUID accountId) {
-        if (accountId == null) {
-            throw new ApiException(ErrorCode.VALIDATION_ERROR, "Account ID cannot be null");
-        }
-        return accountRepository.findById(accountId)
-                .orElseThrow(() -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found"));
-    }
 
     @Override
     @Transactional
@@ -292,5 +276,34 @@ public class AccountServiceImpl implements AccountService {
         refreshTokenService.revokeAllRefreshToken(accountFound.getId());
     }
 
+    @Override
+    public Page<AccountForAdminResponse> getAllAccountsForAdmin(int page, int size, String sortBy, String sortDir, String keyword) {
+
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Account> accountPage = accountRepository.getAllAccount(keyword, pageable);
+
+        Page<AccountForAdminResponse> responses = accountPage.map(account -> {
+            // Lấy role và permission của account đó để trả về cho admin
+
+            Set<Role> roles = roleService.findEntityRolesByAccountIdForAdminGetEntity(account.getId());
+            // map từ role entity sang RoleInformationResponseDTO để trả về cho admin
+            Set<RoleInformationResponseDTO> roleInformationResponseDTOS = roles.stream()
+                    .map(roleMapper::toRoleInformationResponse)
+                    .collect(Collectors.toSet());
+            Set<String> permissions = permissionService.getPermissionsForAccount(account.getId());
+
+            AccountForAdminResponse accountForAdminResponse = accountMapper.toAccountResponseForAdmin(account, account.getProfile());
+            accountForAdminResponse.setRoles(roleInformationResponseDTOS);
+            accountForAdminResponse.setPermissions(permissions);
+
+            return accountForAdminResponse;
+        });
+        return responses;
+    }
 
 }

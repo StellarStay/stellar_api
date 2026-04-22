@@ -52,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
         }
         String email = request.getEmail().toLowerCase().trim();
 
-        Account account = accountService.findAccountByEmail(email);
+        Account account = accountRepository.findByEmail(email);
         if (account == null){
             throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found with email: " + email);
         }
@@ -128,7 +128,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void sendOTPForForgotPassword(String email) {
         // Ở bước này sẽ check email có tồn tại không -> Gửi otp tới email đó
-        Account account = accountService.findAccountByEmail(email);
+        Account account = accountRepository.findByEmail(email);
         if (account == null) {
             throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Email not found, please register first or check your email again");
         }
@@ -140,7 +140,7 @@ public class AuthServiceImpl implements AuthService {
     public void forgotPasswordWithOTP(String email, String otp, String newPassword) {
         // Bước này là xác thực otp + đổi mật khẩu luôn
         otpService.verifyOTP(email, otp, OTPType.FORGOT_PASSWORD);
-        Account account = accountService.findAccountByEmail(email);
+        Account account = accountRepository.findByEmail(email);
         if (account == null) {
             throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Email not found, please register first or check your email again");
         }
@@ -160,10 +160,7 @@ public class AuthServiceImpl implements AuthService {
         if(accountId == null){
             throw new ApiException(ErrorCode.UNAUTHENTICATED, "Please login to change password");
         }
-        Account account = accountService.findAccountById(accountId);
-        if(account == null){
-            throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found with ID: " + accountId);
-        }
+        Account account = accountRepository.findById(accountId).orElseThrow( () -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found with ID: " + accountId));
         // flow change password là:
             // Nhập mật khẩu cũ
                 // hashed mật khẩu cũ nhập vào để so sánh với DB
@@ -185,10 +182,7 @@ public class AuthServiceImpl implements AuthService {
             throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Account ID not found in authentication context");
         }
         // Lấy thông tin tài khoản và profile của account đó
-        Account account = accountService.findAccountById(accountId);
-        if(account == null){
-            throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found with ID: " + accountId);
-        }
+        Account account = accountRepository.findById(accountId).orElseThrow( () -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Account not found"));
         Profile profile= account.getProfile();
         if(profile == null){
             throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Profile not found");

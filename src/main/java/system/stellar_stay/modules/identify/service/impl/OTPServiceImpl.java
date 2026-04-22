@@ -8,6 +8,7 @@ import system.stellar_stay.modules.identify.entity.Account;
 import system.stellar_stay.modules.identify.entity.OTPCode;
 import system.stellar_stay.modules.identify.enums.OTPStatus;
 import system.stellar_stay.modules.identify.enums.OTPType;
+import system.stellar_stay.modules.identify.repository.AccountRepository;
 import system.stellar_stay.modules.identify.repository.OTPRepository;
 import system.stellar_stay.modules.identify.service.AccountService;
 import system.stellar_stay.modules.identify.service.OTPService;
@@ -32,7 +33,7 @@ public class OTPServiceImpl implements OTPService {
     private final OTPRepository otpRepository;
     private final RedisSupported redisSupport;
     private final EmailService emailService;
-    private final AccountService accountService;
+    private final AccountRepository accountRepository;
 
     @Value("${app.otp.email-verify-ttl}")
     private long emailVerifyTtl;
@@ -158,7 +159,7 @@ public class OTPServiceImpl implements OTPService {
             }
 
             // Lấy account liên quan đến OTP đó để set vô
-            Account account = accountService.findAccountByEmail(email);
+            Account account = accountRepository.findByEmail(email);
             if(account != null){
                 otpCode.setAccount(account);
             }

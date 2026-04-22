@@ -6,7 +6,9 @@ CREATE TABLE profiles (
     avatar_url  VARCHAR(255),
     gender VARCHAR(50),
     birth_date DATE,
-    loyalty_points INT NOT NULL DEFAULT 0
+    loyalty_points INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP
 );
 
 ALTER TABLE profiles ADD CONSTRAINT fk_profiles_account FOREIGN KEY (account_id) REFERENCES accounts(id);

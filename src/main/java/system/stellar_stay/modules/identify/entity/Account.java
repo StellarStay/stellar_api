@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import system.stellar_stay.modules.identify.enums.AccountStatus;
+import system.stellar_stay.modules.properties.entity.PropertiesEntity;
+import system.stellar_stay.modules.properties.entity.StaffEntity;
+import system.stellar_stay.modules.properties.entity.SubManagerEntity;
 import system.stellar_stay.shared.infrastructure.persistence.BaseEntity;
 
 import java.util.List;
@@ -41,4 +44,15 @@ public class Account extends BaseEntity {
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Profile profile;
+
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private PropertiesEntity properties;
+
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    // cascade = CascadeType.ALL để tự động xóa SubManagerEntity khi Account bị xóa
+    // orphanRemoval = true để đảm bảo rằng nếu SubManagerEntity không còn liên kết với Account nào thì nó sẽ bị xóa khỏi cơ sở dữ liệu
+    private SubManagerEntity subManager;
+
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private StaffEntity staff;
 }

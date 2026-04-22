@@ -3,6 +3,7 @@ package system.stellar_stay.modules.identify.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import system.stellar_stay.modules.identify.dto.accounts.request.*;
@@ -127,7 +128,7 @@ public class AccountController {
             Dùng để tạo tài khoản cho admin:
             1. Admin nhập thông tin tài khoản mới vào form tạo tài khoản
             2. FE gọi API create account for admin với thông tin tài khoản mới để tạo tài khoản
-            3. Nếu tạo thành công thì trả về thông tin tài khoản đã được tạo, còn nếu tạo thất bại thì trả về lỗi và yêu cầu nhập lại thông tin
+            3. Nếu tạo thành công thì trả về thông tin tài khoản đã được tạo, c��n nếu tạo thất bại thì trả về lỗi và yêu cầu nhập lại thông tin
             """)
     @PostMapping("/admin")
     public ResponseEntity<ApiResponse<AccountForAdminResponse>> createAccountForAdmin(HttpServletRequest request,
@@ -201,6 +202,34 @@ public class AccountController {
                 ApiResponse.<Void>builder()
                         .code(ErrorCode.SUCCESS.getCode())
                         .message("Ban account for admin successfully")
+                        .path(request.getRequestURI())
+                        .timestamp(LocalDateTime.now())
+                        .build()
+        );
+    }
+
+
+
+    // 5. Get all accounts for admin
+    @Operation(summary = "API get all accounts for admin", description = """
+            Dùng để lấy tất cả tài khoản cho admin:
+            1. Admin nhập thông tin tìm kiếm vào form tìm kiếm tài khoản (có thể để trống để lấy tất cả tài khoản)
+            2. FE gọi API get all accounts for admin với thông tin tìm kiếm để lấy tất cả tài khoản phù hợp với thông tin tìm kiếm
+            3. Nếu lấy thành công thì trả về danh sách tài khoản phù hợp với thông tin tìm kiếm, còn nếu lấy thất bại thì trả về lỗi và yêu cầu thử lại sau
+            """)
+    @GetMapping("/admin")
+    public ResponseEntity<ApiResponse<Page<AccountForAdminResponse>>> getAllAccountsForAdmin(HttpServletRequest request,
+                                                                                             @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                                             @RequestParam(value = "size", defaultValue = "10") int size,
+                                                                                             @RequestParam(value = "sortBy", defaultValue = "createdAt") String sort,
+                                                                                             @RequestParam(value = "sortDir", defaultValue = "desc") String sortDir,
+                                                                                             @RequestParam(value = "keyword", required = false) String keyword) {
+
+        return ResponseEntity.ok(
+                ApiResponse.<Page<AccountForAdminResponse>>builder()
+                        .code(ErrorCode.SUCCESS.getCode())
+                        .message("Get all accounts for admin successfully")
+                        .result(accountService.getAllAccountsForAdmin(page, size, sort, sortDir, keyword))
                         .path(request.getRequestURI())
                         .timestamp(LocalDateTime.now())
                         .build()
