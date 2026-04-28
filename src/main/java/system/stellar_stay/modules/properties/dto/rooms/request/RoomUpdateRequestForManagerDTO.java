@@ -4,7 +4,7 @@ import system.stellar_stay.modules.properties.enums.RoomType;
 
 import java.math.BigDecimal;
 
-public record RoomCreateRequestForManagerDTO(
+public record RoomUpdateRequestForManagerDTO(
         String name,
         String roomNumber,
         RoomType roomType,
@@ -13,7 +13,7 @@ public record RoomCreateRequestForManagerDTO(
         int floor,
         BigDecimal area,
         BigDecimal basePrice,
-        String currency
-
+        String currency,
+        boolean isAvailable
 ) {
 }

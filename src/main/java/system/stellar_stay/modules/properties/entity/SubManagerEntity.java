@@ -53,7 +53,7 @@ public class SubManagerEntity{
     private LocalDate assignedAt;
 
     @Column(name = "is_working", nullable = false)
-    private boolean is_working;
+    private boolean isWorking;
 
     @Column(name = "leaved_date")
     private LocalDate leavedAt;

@@ -25,8 +25,8 @@ public interface PropertyRepository extends JpaRepository<PropertiesEntity, UUID
     @Query(value = """
         SELECT p
         FROM PropertiesEntity p
-        LEFT JOIN p.account a
-        LEFT JOIN a.profile pr
+        LEFT JOIN FETCH p.account a
+        LEFT JOIN FETCH a.profile pr
         WHERE (:keyword IS NULL
             OR LOWER(p.address) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))
             OR LOWER(p.city) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))

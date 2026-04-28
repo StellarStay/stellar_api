@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import system.stellar_stay.modules.properties.enums.RoomStatus;
 import system.stellar_stay.modules.properties.enums.RoomType;
 import system.stellar_stay.shared.infrastructure.persistence.BaseEntity;
 
@@ -36,7 +35,7 @@ public class RoomsEntity extends BaseEntity{
     private String description;
 
     @Column(name = "max_occupancy", nullable = false)
-    private int max_occupancy; // số người tối đa/phòng
+    private int maxOccupancy; // số người tối đa/phòng
 
     @Column(name =  "floor", nullable = false)
     private int floor;
@@ -45,14 +44,10 @@ public class RoomsEntity extends BaseEntity{
     private BigDecimal area;
 
     @Column(name = "base_price", nullable = false, precision = 19, scale = 4)
-    private BigDecimal base_price;
+    private BigDecimal basePrice;
 
     @Column(name = "currency", nullable = false)
     private String currency; // đơn vị tiền tệ của giá phòng, ví dụ: USD, EUR, VND
-
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private RoomStatus roomStatus;
 
     @Column(name = "is_available", nullable = false)
     private boolean isAvailable; // trạng thái phòng có sẵn để đặt hay không

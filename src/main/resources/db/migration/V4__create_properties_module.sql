@@ -58,7 +58,6 @@ CREATE TABLE rooms (
     area DECIMAL(10, 2),
     base_price DECIMAL(19, 4) NOT NULL,
     currency VARCHAR(10) NOT NULL,
-    status VARCHAR(50) NOT NULL,
     is_available BOOLEAN NOT NULL,
     property_id UUID NOT NULL
 );
