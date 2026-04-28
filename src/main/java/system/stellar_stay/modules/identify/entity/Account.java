@@ -45,8 +45,8 @@ public class Account extends BaseEntity {
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Profile profile;
 
-    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private PropertiesEntity properties;
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<PropertiesEntity> properties;
 
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     // cascade = CascadeType.ALL để tự động xóa SubManagerEntity khi Account bị xóa

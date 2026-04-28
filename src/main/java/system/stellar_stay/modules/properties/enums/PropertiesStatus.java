@@ -4,5 +4,7 @@ public enum PropertiesStatus {
     PENDING,
     ACTIVE,
     INACTIVE,
-    BANNED
+    REJECTED,
+    BANNED,
+    DELETED
 }

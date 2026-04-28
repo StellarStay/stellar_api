@@ -16,7 +16,7 @@ CREATE TABLE properties (
     email VARCHAR(255) NOT NULL,
     status VARCHAR(50) NOT NULL,
     is_available BOOLEAN NOT NULL,
-    manager_id UUID NOT NULL UNIQUE
+    manager_id UUID NOT NULL
 );
 
 CREATE TABLE sub_managers (

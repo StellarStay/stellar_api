@@ -234,7 +234,7 @@ public class AuthServiceImpl implements AuthService {
 
 
 
-    private UUID extractAccountIdFromContextHolder() {
+    public UUID extractAccountIdFromContextHolder() {
         // Lấy accountId từ SecurityContextHolder (đã được filter xác thực trước đó)
         // Nếu không có hoặc không hợp lệ thì throw exception
         // Trả về accountId dưới dạng UUID

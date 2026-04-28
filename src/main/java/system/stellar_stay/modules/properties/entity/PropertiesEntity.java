@@ -65,14 +65,14 @@ public class PropertiesEntity extends BaseEntity {
     private PropertiesStatus status;
 
     @Column(name = "is_available", nullable = false)
-    private boolean is_available;
+    private boolean isAvailable;
     // field này dùng để manager cho phép hiển thị lên UI hay không
     // Tức là kiểu status là để xem cái property này đang ở trạng thái nào trong hệ thống
     // Còn cái is_available này để quản lý việc hiển thị lên UI hay không đối với khách hàng.
     // ex: status: ACTIVE, is_available: false -> property vẫn hoạt động nhưng khách search méo được do manager bảo trì hay gì đó
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "manager_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_id", nullable = false)
     private Account account;
 
     @OneToOne(mappedBy = "property", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

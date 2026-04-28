@@ -55,7 +55,7 @@ public class RoomsEntity extends BaseEntity{
     private RoomStatus roomStatus;
 
     @Column(name = "is_available", nullable = false)
-    private boolean is_available; // trạng thái phòng có sẵn để đặt hay không
+    private boolean isAvailable; // trạng thái phòng có sẵn để đặt hay không
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id", nullable = false)

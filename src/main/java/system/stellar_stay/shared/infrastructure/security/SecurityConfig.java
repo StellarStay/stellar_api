@@ -34,13 +34,25 @@ public class SecurityConfig {
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     private static final String[] PUBLIC_ROUTES = {
+            // Auth
+            "/api/v1/auth/**",
+
+            // Public APIs
             "/api/v1/**",
-            "/api/v1/properties/**",
-            "/api/v1/rooms/**",
-            "/actuator/health",
-            "/v3/api-docs/**",
+
+            // Swagger
             "/swagger-ui/**",
-            "/swagger-ui.html"
+            "/swagger-ui.html",
+            "/swagger-ui/index.html",
+            "/v3/api-docs/**",
+            "/v3/api-docs.yaml",
+            "/webjars/**",
+
+            // Actuator
+            "/actuator/health",
+
+            // Root (quan trọng — Swagger redirect về đây)
+            "/"
     };
 
     @Bean

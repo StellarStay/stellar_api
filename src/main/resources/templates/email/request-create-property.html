@@ -1,0 +1,95 @@
+<!-- ── request-create-property.html ── -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yêu cầu tạo Property — Stella Booking</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #f5f5f5; font-family: Arial, sans-serif; }
+        .wrapper { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 8px; overflow: hidden; border: 1px solid #e0e0e0; }
+        .header { background-color: #1D9E75; padding: 32px 40px; text-align: center; }
+        .header-title { color: #ffffff; font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
+        .header-sub { color: #9FE1CB; font-size: 14px; margin-top: 4px; }
+        .body { padding: 36px 40px; }
+        .greeting { font-size: 16px; color: #222222; font-weight: 600; margin-bottom: 12px; }
+        .desc { font-size: 14px; color: #555555; line-height: 1.7; margin-bottom: 24px; }
+        .info-box { background-color: #f9f9f9; border: 1px solid #eeeeee; border-radius: 6px; padding: 20px; margin-bottom: 24px; }
+        .info-row { display: flex; align-items: flex-start; margin-bottom: 12px; font-size: 14px; }
+        .info-row:last-child { margin-bottom: 0; }
+        .info-label { width: 140px; color: #666666; font-weight: 600; flex-shrink: 0; }
+        .info-value { color: #222222; font-weight: 700; flex-grow: 1; }
+        .notice-box { background-color: #E1F5EE; border-left: 3px solid #1D9E75; border-radius: 0 6px 6px 0; padding: 14px 16px; margin-bottom: 24px; }
+        .notice-box p { font-size: 13px; color: #085041; line-height: 1.7; margin: 0; }
+        .divider { border: none; border-top: 1px solid #eeeeee; margin: 24px 0; }
+        .action-note { font-size: 13px; color: #555555; line-height: 1.6; }
+        .footer { background-color: #f9f9f9; padding: 20px 40px; border-top: 1px solid #eeeeee; }
+        .footer-brand { font-size: 14px; font-weight: 700; color: #1D9E75; margin-bottom: 4px; }
+        .footer-text { font-size: 12px; color: #aaaaaa; line-height: 1.6; }
+        .footer-text a { color: #1D9E75; text-decoration: none; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">Stella Booking</div>
+        <div class="header-sub">Yêu cầu tạo Property mới</div>
+    </div>
+
+    <!-- Body -->
+    <div class="body">
+        <p class="greeting">Xin chào Admin,</p>
+        <p class="desc">
+            Có một yêu cầu mới tạo Property trên hệ thống <strong>Stella Booking</strong>. Dưới đây là thông tin chi tiết:
+        </p>
+
+        <!-- Information Box -->
+        <div class="info-box">
+            <div class="info-row">
+                <div class="info-label">Tên Manager:</div>
+                <div class="info-value" th:text="${ownerName}">Nguyễn Văn A</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Tên Property:</div>
+                <div class="info-value" th:text="${name}">Khách sạn Hoa Hồng</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Loại hình:</div>
+                <div class="info-value" th:text="${propertyType}">HOTEL</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">Địa chỉ:</div>
+                <div class="info-value" th:text="${address}">123 Đường Điện Biên Phủ, Phường 15, Bình Thạnh, TP.HCM</div>
+            </div>
+        </div>
+
+        <!-- Notice -->
+        <div class="notice-box">
+            <p>
+                Vui lòng truy cập vào <strong>Bảng điều khiển Admin (Dashboard)</strong> để xem xét chi tiết và tiến hành <strong>Phê duyệt (Approve)</strong> hoặc <strong>Từ chối (Reject)</strong> yêu cầu tạo Property này.
+            </p>
+        </div>
+
+        <hr class="divider">
+
+        <p class="action-note">
+            Cảm ơn bạn đã hỗ trợ!<br>
+            Hệ thống Stella Booking
+        </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-brand">Stella Booking</div>
+        <div class="footer-text">
+            Email này được gửi tự động từ hệ thống quản lý, vui lòng không trả lời.<br>
+            Nếu cần hỗ trợ kỹ thuật, liên hệ <a href="mailto:tommyviet183@stellabooking.com">tommyviet183@stellabooking.com</a>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
