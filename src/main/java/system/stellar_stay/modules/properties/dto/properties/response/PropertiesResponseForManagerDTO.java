@@ -6,7 +6,7 @@ import system.stellar_stay.modules.properties.enums.PropertiesType;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public record ListPropertiesResponseForManagerDTO(
+public record PropertiesResponseForManagerDTO(
         UUID propertiesId,
         String name,
         String slug,
@@ -21,7 +21,6 @@ public record ListPropertiesResponseForManagerDTO(
         String phone,
         String email,
         PropertiesStatus status,
-        boolean isAvailable
-
+        Boolean isAvailable
 ) {
 }

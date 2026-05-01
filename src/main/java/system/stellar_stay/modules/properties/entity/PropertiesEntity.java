@@ -83,4 +83,7 @@ public class PropertiesEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomsEntity> rooms;
+
+    @OneToMany(mappedBy = "property", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PropertyImageEntity> images;
 }

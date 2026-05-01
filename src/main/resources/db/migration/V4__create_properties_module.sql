@@ -73,6 +73,17 @@ CREATE TABLE room_images (
     is_primary BOOLEAN NOT NULL
 );
 
+CREATE TABLE property_images (
+    id UUID PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP,
+    property_id UUID NOT NULL,
+    url VARCHAR(1000) NOT NULL,
+    media_type VARCHAR(50) NOT NULL,
+    sort_order INT NOT NULL,
+    is_primary BOOLEAN NOT NULL
+);
+
 CREATE TABLE amenities (
     id UUID PRIMARY KEY,
     created_at TIMESTAMP NOT NULL,
@@ -90,6 +101,7 @@ CREATE TABLE room_amenities (
 
 -- Thêm Foreign Keys
 ALTER TABLE properties ADD CONSTRAINT fk_properties_manager FOREIGN KEY (manager_id) REFERENCES accounts(id);
+ALTER TABLE property_images ADD CONSTRAINT fk_property_images_property FOREIGN KEY (property_id) REFERENCES properties(id);
 
 ALTER TABLE sub_managers ADD CONSTRAINT fk_sub_managers_account FOREIGN KEY (sub_manager_id) REFERENCES accounts(id);
 ALTER TABLE sub_managers ADD CONSTRAINT fk_sub_managers_property FOREIGN KEY (property_id) REFERENCES properties(id);

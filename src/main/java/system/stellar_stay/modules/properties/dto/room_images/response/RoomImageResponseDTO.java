@@ -4,8 +4,8 @@ import system.stellar_stay.modules.properties.enums.MediaType;
 
 public record RoomImageResponseDTO(
     String url,
-    MediaType type,
+    MediaType mediaType,
     int sortOrder,
-    boolean isPrimary
+    Boolean primary
 ) {
 }

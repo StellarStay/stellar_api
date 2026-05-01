@@ -4,8 +4,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import system.stellar_stay.modules.properties.dto.rooms.response.ListRoomResponseDTO;
 import system.stellar_stay.modules.properties.entity.RoomsEntity;
 
 import java.util.UUID;
@@ -18,38 +18,40 @@ public interface RoomRepository extends JpaRepository<RoomsEntity, UUID> {
         SELECT r
         FROM RoomsEntity r
         LEFT JOIN FETCH r.images i
-        WHERE (:keyword IS NULL
+        WHERE r.property.id = :propertyId AND (:keyword IS NULL
             OR LOWER(r.name) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))
             OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')))
         """,
             countQuery = """
-        SELECT COUNT(r)
+        SELECT COUNT(DISTINCT r)
         FROM RoomsEntity r
-        LEFT JOIN r.images i
-        WHERE (:keyword IS NULL
+        WHERE r.property.id = :propertyId AND (:keyword IS NULL
             OR LOWER(r.name) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))
             OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')))
         """)
-    Page<ListRoomResponseDTO> getAllRoomForManager(String keyword, Pageable pageable);
+    Page<RoomsEntity> getAllRoomForManager(@Param("propertyId") UUID propertyId,
+                                           @Param("keyword") String keyword,
+                                           Pageable pageable);
 
 
     @Query(value = """
         SELECT r
         FROM RoomsEntity r
         LEFT JOIN FETCH r.images i
-        WHERE (:keyword IS NULL
+        WHERE r.property.id = :propertyId AND (:keyword IS NULL
             OR LOWER(r.name) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))
             OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')))
             AND r.isAvailable = true
         """,
             countQuery = """
-        SELECT COUNT(r)
+        SELECT COUNT(DISTINCT r)
         FROM RoomsEntity r
-        LEFT JOIN r.images i
-        WHERE (:keyword IS NULL
+        WHERE r.property.id = :propertyId AND (:keyword IS NULL
             OR LOWER(r.name) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))
             OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')))
             AND r.isAvailable = true
         """)
-    Page<ListRoomResponseDTO> getAllRoomForPublic(String keyword, Pageable pageable);
+    Page<RoomsEntity> getAllRoomForPublic(@Param("propertyId") UUID propertyId,
+                                          @Param("keyword") String keyword,
+                                          Pageable pageable);
 }

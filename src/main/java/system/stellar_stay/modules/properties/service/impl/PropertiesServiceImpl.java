@@ -12,9 +12,9 @@ import system.stellar_stay.modules.identify.repository.AccountRepository;
 import system.stellar_stay.modules.identify.service.impl.AuthServiceImpl;
 import system.stellar_stay.modules.properties.dto.properties.request.PropertiesUpdateRequestForManagerDTO;
 import system.stellar_stay.modules.properties.dto.properties.request.PropertyCreateRequestForManagerDTO;
-import system.stellar_stay.modules.properties.dto.properties.response.ListPropertiesResponseForAdminDTO;
-import system.stellar_stay.modules.properties.dto.properties.response.ListPropertiesResponseForManagerDTO;
+import system.stellar_stay.modules.properties.dto.properties.response.*;
 import system.stellar_stay.modules.properties.entity.PropertiesEntity;
+import system.stellar_stay.modules.properties.entity.PropertyImageEntity;
 import system.stellar_stay.modules.properties.enums.PropertiesStatus;
 import system.stellar_stay.modules.properties.mapper.PropertyMapper;
 import system.stellar_stay.modules.properties.repository.PropertyRepository;
@@ -23,7 +23,7 @@ import system.stellar_stay.shared.common.exception.ApiException;
 import system.stellar_stay.shared.common.exception.ErrorCode;
 import system.stellar_stay.shared.common.service.EmailService;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -40,9 +40,10 @@ public class PropertiesServiceImpl implements PropertiesService {
 
 
 
+// FOR MANAGER
 
     @Override
-    public ListPropertiesResponseForManagerDTO requestCreatePropertiesForManager(PropertyCreateRequestForManagerDTO propertyCreateRequestForManagerDTO) {
+    public PropertiesResponseForManagerDTO requestCreatePropertiesForManager(PropertyCreateRequestForManagerDTO propertyCreateRequestForManagerDTO) {
         if(propertyCreateRequestForManagerDTO == null) {
             log.error("PropertyRequestForManagerDTO is null");
             throw new ApiException(ErrorCode.VALIDATION_ERROR, "Request is not null");
@@ -65,11 +66,11 @@ public class PropertiesServiceImpl implements PropertiesService {
         // Gửi email thông báo cho Admin
         emailService.sendRequestCreatePropertyEmail(properties);
 
-        return propertyMapper.toResponseForManagerDTO(properties);
+        return propertyMapper.toPropertyResponseForManagerDTO(properties);
     }
 
     @Override
-    public ListPropertiesResponseForManagerDTO updatePropertiesForManager(UUID propertyId, PropertiesUpdateRequestForManagerDTO propertyUpdateRequestForManagerDTO) {
+    public PropertiesResponseForManagerDTO updatePropertiesForManager(UUID propertyId, PropertiesUpdateRequestForManagerDTO propertyUpdateRequestForManagerDTO) {
         if(propertyId == null || propertyUpdateRequestForManagerDTO == null) {
             throw new ApiException(ErrorCode.VALIDATION_ERROR, "PropertyId or Request is not null");
         }
@@ -85,39 +86,54 @@ public class PropertiesServiceImpl implements PropertiesService {
         // Chỗ này thay vì manager truyền status thì để hoàn toàn status cho admin quản lý, và manager quản lý cái is_available thôi
         propertyMapper.updatePropertyByManager(propertyUpdateRequestForManagerDTO, properties);
         propertyRepository.save(properties);
-        return propertyMapper.toResponseForManagerDTO(properties);
+        return propertyMapper.toPropertyResponseForManagerDTO(properties);
     }
 
     @Override
-    public Set<ListPropertiesResponseForManagerDTO> getPropertiesByManagerId() {
+    public Page<ListPropertiesResponseForManager> getPropertiesByManagerId(int page, int size, String sortBy, String sortDir, String keyword) {
         UUID managerId = authService.extractAccountIdFromContextHolder();
         if(managerId == null){
             throw new ApiException(ErrorCode.VALIDATION_ERROR, "ManagerId is null");
         }
-        Set<PropertiesEntity> properties = propertyRepository.findByAccountId(managerId);
-        if(properties.isEmpty()) {
-            throw new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "No properties found for the manager with ID: " + managerId);
-        }
-        // Thực hiện mapping từ Set<PropertiesEntity> sang Set<PropertyResponseForManagerDTO>
-        return propertyMapper.toResponseDTOSet(properties);
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<PropertiesEntity> listProperty = propertyRepository.findPropertyByManagerId(managerId, keyword, pageable);
+        return listProperty.map(
+                property ->{
+                    ListPropertiesResponseForManager propertyResponse = propertyMapper.toPropertyListResponseForManager(property);
+                    property.getImages().stream()
+                            .filter(PropertyImageEntity::isPrimary)
+                            .findFirst()
+                            .ifPresent(thumbnailImage -> propertyResponse.setUrlThumbnailImage(thumbnailImage.getUrl()));
+                    return propertyResponse;
+                }
+        );
     }
 
-//    @Override
-//    public PropertyResponseForManagerDTO getDetailPropertiesByIdForManager(UUID propertyId) {
-//        if(propertyId == null) {
-//            throw new ApiException(ErrorCode.VALIDATION_ERROR, "PropertyId or Request is not null");
-//        }
-//        PropertiesEntity properties = propertyRepository.findById(propertyId).orElseThrow(
-//                () -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Property not found"));
-//
-//        // Check xem properties này có thuộc về manager đang đăng nhập không ?
-//        // Lấy ra accountId
-//        UUID managerId = authService.extractAccountIdFromContextHolder();
-//        if (!managerId.equals(properties.getAccount().getId())) {
-//            throw new ApiException(ErrorCode.FORBIDDEN, "This property does not belong to the manager");
-//        }
-//        return propertyMapper.toResponseForManagerDTO(properties);
-//    }
+    @Override
+    public PropertyDetailResponseForManagerDTO getDetailPropertiesByIdForManager(UUID propertyId) {
+        if(propertyId == null) {
+            throw new ApiException(ErrorCode.VALIDATION_ERROR, "PropertyId or Request is not null");
+        }
+        PropertiesEntity properties = propertyRepository.findById(propertyId).orElseThrow(
+                () -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Property not found"));
+
+        // Check xem properties này có thuộc về manager đang đăng nhập không ?
+        // Lấy ra accountId
+        UUID managerId = authService.extractAccountIdFromContextHolder();
+        if (!managerId.equals(properties.getAccount().getId())) {
+            throw new ApiException(ErrorCode.FORBIDDEN, "This property does not belong to the manager");
+        }
+
+        PropertyDetailResponseForManagerDTO propertyDetail = propertyMapper.toPropertyResponseDetailForManagerDTO(properties);
+        List<PropertyImageEntity> images = properties.getImages();
+        propertyDetail.setListPropertyImage(propertyMapper.toPropertyImageResponseDTO(images));
+
+        return propertyDetail;
+    }
 
 
 
@@ -126,14 +142,7 @@ public class PropertiesServiceImpl implements PropertiesService {
 
 
 
-
-
-
-
-
-
-
-
+// FOR ADMIN
     @Override
     public void updatedStatusPropertiesForRequest(UUID propertyId, PropertiesStatus status, String reason) {
 
@@ -175,7 +184,7 @@ public class PropertiesServiceImpl implements PropertiesService {
     }
 
     @Override
-    public Page<ListPropertiesResponseForAdminDTO> getAllPropertiesForAdmin(int page, int size, String sortBy, String sortDir, String keyword) {
+    public Page<ListPropertiesResponseForAdmin> getAllPropertiesForAdmin(int page, int size, String sortBy, String sortDir, String keyword) {
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
@@ -188,15 +197,30 @@ public class PropertiesServiceImpl implements PropertiesService {
 
 
         return propertiesEntityPage.map(property -> {
-            ListPropertiesResponseForAdminDTO dto = propertyMapper.toResponseForAdminDTO(property);
+            ListPropertiesResponseForAdmin dto = propertyMapper.toListResponseForAdmin(property);
+            property.getImages().stream()
+                    .filter(PropertyImageEntity::isPrimary)
+                    .findFirst()
+                    .ifPresent(thumbnailImage -> dto.setUrlThumbnailImage(thumbnailImage.getUrl()));
             // Lấy thông tin manager từ properties.getAccount()
             dto.setManager(propertyMapper.managerResponseFromAccount(property.getAccount()));
             return dto;
         });
     }
 
-//    @Override
-//    public PropertyResponseForAdminDTO getDetailPropertiesByIdForAdmin(UUID propertyId) {
-//        return null;
-//    }
+    @Override
+    public PropertyDetailResponseForAdminDTO getDetailPropertiesByIdForAdmin(UUID propertyId) {
+        if(propertyId == null) {
+            throw new ApiException(ErrorCode.VALIDATION_ERROR, "PropertyId is not null");
+        }
+        PropertiesEntity properties = propertyRepository.findById(propertyId).orElseThrow(
+                () -> new ApiException(ErrorCode.RESOURCE_NOT_FOUND, "Property not found"));
+
+        PropertyDetailResponseForAdminDTO propertyDetail = propertyMapper.toPropertyResponseDetailForAdminDTO(properties);
+        List<PropertyImageEntity> images = properties.getImages();
+        propertyDetail.setListPropertyImage(propertyMapper.toPropertyImageResponseDTO(images));
+        // Lấy thông tin manager từ properties.getAccount()
+        propertyDetail.setManager(propertyMapper.managerResponseFromAccount(properties.getAccount()));
+        return propertyDetail;
+    }
 }

@@ -1,18 +1,22 @@
 package system.stellar_stay.modules.properties.dto.properties.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import system.stellar_stay.modules.properties.dto.property_images.response.PropertyImageResponseDTO;
 import system.stellar_stay.modules.properties.enums.PropertiesStatus;
 import system.stellar_stay.modules.properties.enums.PropertiesType;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class ListPropertiesResponseForAdminDTO {
+public class PropertyDetailResponseForManagerDTO {
     private UUID propertiesId;
     private String name;
     private String slug;
@@ -27,6 +31,7 @@ public class ListPropertiesResponseForAdminDTO {
     private String phone;
     private String email;
     private PropertiesStatus status;
-    private boolean isAvailable;
-    private ManagerResponse manager;
+    private Boolean isAvailable;
+    private List<PropertyImageResponseDTO> listPropertyImage;
+
 }
