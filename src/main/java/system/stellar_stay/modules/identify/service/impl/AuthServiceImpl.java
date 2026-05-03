@@ -199,7 +199,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public void refreshForToken(HttpServletRequest request, HttpServletResponse response) {
 
         // Idea là lấy refreshToken từ cookie
         // Từ cái refreshToken đó thì sẽ verify xem token đó có hợp lệ hay không,

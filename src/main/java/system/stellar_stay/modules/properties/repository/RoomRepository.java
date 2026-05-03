@@ -17,7 +17,6 @@ public interface RoomRepository extends JpaRepository<RoomsEntity, UUID> {
     @Query(value = """
         SELECT r
         FROM RoomsEntity r
-        LEFT JOIN FETCH r.images i
         WHERE r.property.id = :propertyId AND (:keyword IS NULL
             OR LOWER(r.name) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))
             OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')))
@@ -37,7 +36,6 @@ public interface RoomRepository extends JpaRepository<RoomsEntity, UUID> {
     @Query(value = """
         SELECT r
         FROM RoomsEntity r
-        LEFT JOIN FETCH r.images i
         WHERE r.property.id = :propertyId AND (:keyword IS NULL
             OR LOWER(r.name) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%'))
             OR LOWER(r.roomType) LIKE LOWER(CONCAT('%', CAST(:keyword AS string), '%')))

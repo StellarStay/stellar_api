@@ -10,5 +10,7 @@ public enum AmenitiesType {
     PET_FRIENDLY,
     SPA,
     RESTAURANT,
-    BAR
+    BAR,
+    TELEVISION,
+    BALCONY
 }

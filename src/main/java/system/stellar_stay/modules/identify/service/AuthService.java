@@ -22,7 +22,7 @@ public interface AuthService {
 
     ProfileInformationResponse getProfileInformation();
 
-    void refreshToken(HttpServletRequest request, HttpServletResponse response);
+    void refreshForToken(HttpServletRequest request, HttpServletResponse response);
 
 
 }

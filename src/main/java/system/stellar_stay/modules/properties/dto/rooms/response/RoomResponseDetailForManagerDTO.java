@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import system.stellar_stay.modules.properties.dto.amenities.response.AmenityResponseDTO;
+import system.stellar_stay.modules.properties.dto.amenities.response.AmenityItemResponseDTO;
 import system.stellar_stay.modules.properties.dto.room_images.response.RoomImageResponseDTO;
 import system.stellar_stay.modules.properties.enums.RoomType;
 
@@ -29,5 +29,5 @@ public class RoomResponseDetailForManagerDTO{
     private String currency;
     private Boolean isAvailable;
     private List<RoomImageResponseDTO> roomImages;
-    private List<AmenityResponseDTO> roomAmenities;
+    private List<AmenityItemResponseDTO> roomAmenities;
 }

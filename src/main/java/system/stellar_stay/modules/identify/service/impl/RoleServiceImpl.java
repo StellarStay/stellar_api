@@ -48,7 +48,7 @@ public class RoleServiceImpl implements RoleService {
 
         Set<PermissionGroupResponseDTO> permissionGroupResponses = Collections.emptySet(); // Khởi tạo set rỗng cho permission group responses
 
-        // assign permisison cho role này
+        // assign permission cho role này
         if (roleRequestDTO.permissionIds() != null && !roleRequestDTO.permissionIds().isEmpty()) {
             Set<Permission> permissions = permissionService.getAllByPermissionIds(roleRequestDTO.permissionIds());
 

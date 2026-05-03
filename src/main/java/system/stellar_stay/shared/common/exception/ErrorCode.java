@@ -49,7 +49,11 @@ public enum ErrorCode {
 
     // ── Ticket ──────────────────────────────────────────────────
     TICKET_NOT_FOUND        ("ticket_not_found",        HttpStatus.NOT_FOUND, "Ticket không tồn tại"),
-    TICKET_ALREADY_RESOLVED ("ticket_already_resolved", HttpStatus.CONFLICT, "Ticket đã được giải quyết");
+    TICKET_ALREADY_RESOLVED ("ticket_already_resolved", HttpStatus.CONFLICT, "Ticket đã được giải quyết"),
+
+    // ── S3 ──────────────────────────────────────────────────
+    FAIL_TO_UPLOAD          ("fail_to_upload", HttpStatus.BAD_REQUEST, "Không thể tải lên file"),
+    FAIL_TO_GENERATED_PRESIGN_KEY ("fail_to_generate_prKey", HttpStatus.BAD_REQUEST, "Không thể tạo presigned URL"),;
 
 
     private final String code;

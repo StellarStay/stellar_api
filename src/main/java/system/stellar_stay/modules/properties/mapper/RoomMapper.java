@@ -18,10 +18,10 @@ import java.util.List;
 public interface RoomMapper {
 
 
-    @Mapping(target = "url", source = "roomImageEntity.url")
-    @Mapping(target = "mediaType", source = "roomImageEntity.mediaType")
-    @Mapping(target = "sortOrder", source = "roomImageEntity.sortOrder")
-    @Mapping(target = "primary", source = "roomImageEntity.primary")
+    @Mapping(target = "url", source = "listRoomImageEntity.url")
+    @Mapping(target = "mediaType", source = "listRoomImageEntity.mediaType")
+    @Mapping(target = "sortOrder", source = "listRoomImageEntity.sortOrder")
+    @Mapping(target = "primary", source = "listRoomImageEntity.primary")
     List<RoomImageResponseDTO> toListRoomImageResponseDTO(List<RoomImageEntity> listRoomImageEntity);
 
     // FOR MANAGER

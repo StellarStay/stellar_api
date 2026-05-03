@@ -143,12 +143,12 @@ public class AuthController {
             Khi gọi API này, hệ thống sẽ kiểm tra refresh token trong cookie, nếu hợp lệ thì sẽ tạo mới access token và refresh token, 
             đồng thời cập nhật cookie mới cho client.
             """)
-    @PostMapping("/refresh-token")
-    public ResponseEntity<ApiResponse<Void>> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        authService.refreshToken(request, response);
+    @PostMapping("/refresh-for-token")
+    public ResponseEntity<ApiResponse<Void>> refreshForToken(HttpServletRequest request, HttpServletResponse response) {
+        authService.refreshForToken(request, response);
         return ResponseEntity.ok(ApiResponse.<Void>builder()
                 .code(ErrorCode.SUCCESS.getCode())
-                .message("Refresh token successful")
+                .message("Refresh For token successful")
                 .path(request.getRequestURI())
                 .timestamp(LocalDateTime.now())
                 .build());
